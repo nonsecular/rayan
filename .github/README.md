@@ -1,4 +1,4 @@
-# 🥀 𝐅𝐀𝐃𝐄𝐃 𝐌𝐔𝐒𝐈𝐂  🌷
+# ⚡𝐂𝐎𝐅𝐅𝐈𝐍 𝐌𝐔𝐒𝐈𝐂⚰
 ➥ 𝖧ᴇʀᴏᴋᴜ 𝖭ᴇᴡ 𝖤ʀʀᴏʀ 𝖥ɪ𝐱ᴇᴅ ✔️ 
  ➥ 𝖥ɪʀsᴛ 𝖥ᴏʀᴋ 𝖳ʜɪs 𝖱ᴇʀᴏ 𝖠ɴᴅ 𝖦ɪᴠᴇ ᴀ 𝖲ᴛᴀʀ ⭐
   ➥ 𝖳ʜᴇɴ ʜᴏsᴛ ᴏɴ ʜᴇʀᴋᴏᴜ 👨🏻‍💻
@@ -10,11 +10,11 @@
    
  <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
 
-<img src="https://readme-typing-svg.herokuapp.com?color=FF0085&width=620&lines=🍁+🚩+𝗣𝗢𝗪𝗘𝗥𝗘𝗗+𝗕𝗬+𝗙𝗔𝗗𝗘𝗗+🚩+🍁"></b></h3>
+<img src="https://readme-typing-svg.herokuapp.com?color=FF0085&width=620&line+☠️+🚩+𝗣𝗢𝗪𝗘𝗥𝗘𝗗+𝗕𝗬+𝗙𝗔𝗗𝗘𝗗+🚩+☠️"></b></h3>
 
  <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
 
-<h1 align="center"><b>ғᴀᴅᴇᴅ Mᴜsɪᴄ Bᴏᴛ</b></h1>
+<h1 align="center"><b> Cᴏғғɪɴ Mᴜsɪᴄ Bᴏᴛ</b></h1>
 <p align="center"><a href="https://t.me/Coffin_Ka_Bhai_Faded"><img src="https://files.catbox.moe/gaompc.jpg" width="400"></a></p>
 
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
