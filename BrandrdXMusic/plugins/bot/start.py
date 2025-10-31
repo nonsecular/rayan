@@ -30,7 +30,7 @@ async def start_pm(client, message: Message, _):
     await message.react("♡")
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
-        if name[0:3] == "help":
+        if name[0:4] == "help":
             keyboard = help_pannel(_)
             await message.reply_sticker("CAACAgUAAyEFAATAaxXrAAP9aQPAkQABhzpjCoDWA29txJ8D0z27AAJVHgAC0LGoVwy-XYLwjWvgHgQ")
             return await message.reply_photo(
