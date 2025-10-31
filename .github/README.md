@@ -6,8 +6,7 @@
  
 
 ### 𝙁𝘼𝘿𝙀𝘿 𝙊𝙋 ⚡
-<h1 align="center"
-   
+<h1 align="center"   
  <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
 
 <img src="https://readme-typing-svg.herokuapp.com?color=FF0085&width=620&line+☠️+🚩+𝗣𝗢𝗪𝗘𝗥𝗘𝗗+𝗕𝗬+𝗙𝗔𝗗𝗘𝗗+🚩+☠️"></b></h3>
