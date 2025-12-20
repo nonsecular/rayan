@@ -14,8 +14,8 @@ from BrandrdXMusic.mongo.couples_db import _get_image, get_couple
 POLICE = [
     [
         InlineKeyboardButton(
-            text="ᴍʏ ᴅᴇᴠᴇʟᴏᴘᴇʀ 🥂",
-            url=f"https://t.me/Codexoxy",
+            text="Oxcy",
+            url=f"https://t.me/",
         ),
     ],
 ]
@@ -49,7 +49,7 @@ async def ctest(_, message):
     try:
      #  is_selected = await get_couple(cid, today)
      #  if not is_selected:
-         msg = await message.reply_text("ɢᴇɴᴇʀᴀᴛɪɴɢ ᴄᴏᴜᴘʟᴇs ɪᴍᴀɢᴇ...")
+         msg = await message.reply_text("Gᴇɴᴇʀᴀᴛɪɴɢ Fᴀᴍɪʟʏ...")
          #GET LIST OF USERS
          list_of_users = []
 
@@ -68,6 +68,7 @@ async def ctest(_, message):
  
          N1 = (await app.get_users(c1_id)).mention 
          N2 = (await app.get_users(c2_id)).mention
+        
          
          try:
             p1 = await app.download_media(photo1.big_file_id, file_name="pfp.png")
@@ -81,7 +82,7 @@ async def ctest(_, message):
          img1 = Image.open(f"{p1}")
          img2 = Image.open(f"{p2}")
 
-         img = Image.open("BrandrdXMusic/assets/cppicbranded.jpg")
+         img = Image.open("BrandrdXMusic/assets/ANNIECP.png")
 
          img1 = img1.resize((437,437))
          img2 = img2.resize((437,437))
@@ -106,11 +107,11 @@ async def ctest(_, message):
          img.save(f'test_{cid}.png')
     
          TXT = f"""
-**ᴛᴏᴅᴀʏ's ᴄᴏᴜᴘʟᴇ ᴏғ ᴛʜᴇ ᴅᴀʏ :
+**Cᴏᴜᴘʟᴇ Oғ Tʜᴇ Dᴀʏ :
 
-{N1} + {N2} = 💚
+{N1} + {N2} = ❣️
 
-ɴᴇxᴛ ᴄᴏᴜᴘʟᴇs ᴡɪʟʟ ʙᴇ sᴇʟᴇᴄᴛᴇᴅ ᴏɴ {tomorrow} !!**
+Hᴀᴠᴇ A Nɪᴄᴇ HᴏɴᴇʏMᴏᴏɴ 🥰 !!**
 """
     
          await message.reply_photo(f"test_{cid}.png", caption=TXT, reply_markup=InlineKeyboardMarkup(POLICE),
@@ -132,11 +133,11 @@ async def ctest(_, message):
         # c2_name = (await app.get_users(c2_id)).first_name
          
       #   TXT = f"""
-#**ᴛᴏᴅᴀʏ's sᴇʟᴇᴄᴛᴇᴅ ᴄᴏᴜᴘʟᴇs 🎉 :
+#**𝐓ᴏᴅᴀʏ's 𝐒ᴇʟᴇᴄᴛᴇᴅ 𝐂ᴏᴜᴘʟᴇs 🎉 :
 #➖➖➖➖➖➖➖➖➖➖➖➖
 #[{c1_name}](tg://openmessage?user_id={c1_id}) + [{c2_name}](tg://openmessage?user_id={c2_id}) = ❣️
 #➖➖➖➖➖➖➖➖➖➖➖➖
-#ɴᴇxᴛ ᴄᴏᴜᴘʟᴇꜱ ᴡɪʟʟ ʙᴇ ꜱᴇʟᴇᴄᴛᴇᴅ ᴏɴ {tomorrow} !!**
+#𝐍ᴇxᴛ 𝐂ᴏᴜᴘʟᴇs 𝐖ɪʟʟ 𝐁ᴇ 𝐒ᴇʟᴇᴄᴛᴇᴅ 𝐎ɴ {tomorrow} !!**
 #"""
  #        await message.reply_photo(b, caption=TXT)
         # await msg.delete()
@@ -154,14 +155,3 @@ __mod__ = "COUPLES"
 __help__ = """
 **» /couples** - Get Todays Couples Of The Group In Interactive View
 """
-
-
-
-
-
-    
-
-
-
-
-    
