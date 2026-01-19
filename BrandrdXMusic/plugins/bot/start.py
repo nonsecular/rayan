@@ -8,6 +8,8 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
 
 import config
+from config import BANNED_USERS   # ✅ ADD THIS LINE
+
 from BrandrdXMusic import app
 from BrandrdXMusic.misc import _boot_
 from BrandrdXMusic.plugins.sudo.sudoers import sudoers_list
