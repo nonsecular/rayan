@@ -96,7 +96,22 @@ confirmer = {}
 
 
 START_IMG_URL = getenv(
-    "START_IMG_URL", "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
+    "START_IMG_URL",
+    "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
+)
+
+START_VID_URL = getenv(
+    "START_VID_URL",
+    "https://files.catbox.moe/m8wvfi.mp4"
+)
+
+)
+
+START_VID_URL = getenv(
+    "START_VID_URL",
+    "https://files.catbox.moe/m8wvfi.mp4"
+)
+
 )
 
 STICKERS = [
