@@ -22,10 +22,10 @@ from BrandrdXMusic.utils.database import (
 from BrandrdXMusic.utils.decorators.language import LanguageStart
 from BrandrdXMusic.utils.formatters import get_readable_time
 from BrandrdXMusic.utils.inline import help_pannel, private_panel, start_panel
-from config import *
 from strings import get_string
 
 
+# ================= PRIVATE START ================= #
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
@@ -35,35 +35,21 @@ async def start_pm(client, message: Message, _):
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
 
-        if name[0:4] == "help":
+        if name.startswith("help"):
             keyboard = help_pannel(_)
-            sticker_message = await message.reply_sticker(
-                sticker=random.choice(STICKERS)
-            )
-
-            return await message.reply_photo(
-                photo=config.START_IMG_URL,
+            return await message.reply_video(
+                video=config.START_VID_URL,
                 caption=_["help_1"].format(config.SUPPORT_CHAT),
                 reply_markup=keyboard,
             )
 
-        if name[0:3] == "sud":
+        if name.startswith("sud"):
             await sudoers_list(client=client, message=message, _=_)
-            if await is_on_off(2):
-                return await app.send_message(
-                    chat_id=config.LOGGER_ID,
-                    text=(
-                        f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ "
-                        f"ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n"
-                        f"<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n"
-                        f"<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}"
-                    ),
-                )
             return
 
-        if name[0:3] == "inf":
+        if name.startswith("inf"):
             m = await message.reply_text("🔎")
-            query = (str(name)).replace("info_", "", 1)
+            query = name.replace("info_", "", 1)
             query = f"https://www.youtube.com/watch?v={query}"
 
             results = VideosSearch(query, limit=1)
@@ -97,69 +83,39 @@ async def start_pm(client, message: Message, _):
                 caption=searched_text,
                 reply_markup=key,
             )
-
-            if await is_on_off(2):
-                return await app.send_message(
-                    chat_id=config.LOGGER_ID,
-                    text=(
-                        f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ "
-                        f"ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n"
-                        f"<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n"
-                        f"<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}"
-                    ),
-                )
             return
 
-    else:
-        out = private_panel(_)
-        await message.react("❤️")
+    # NORMAL START
+    out = private_panel(_)
 
-        loading_1 = await message.reply_text(
-            "𝑯𝒐𝒊𝒊!! 𝑱𝒂𝒏𝒖𝒖𝒖𝒖𝒖 🥀❤️"
-        )
+    loading = await message.reply_text("𝑯𝒐𝒊𝒊!! 𝑱𝒂𝒏𝒖𝒖𝒖𝒖𝒖 🥀❤️")
+    for dots in ["", ".", "..", "..."]:
+        await loading.edit_text(f"<b>Sᴛᴀʀᴛɪɴɢ{dots}</b>")
+        await asyncio.sleep(0.3)
+    await loading.delete()
 
-        for dots in ["", ".", "..", "..."]:
-            await loading_1.edit_text(f"<b>Sᴛᴀʀᴛɪɴɢ{dots}</b>")
-            await asyncio.sleep(0.3)
-
-        await loading_1.delete()
-
-        sticker_message = await message.reply_sticker(
-            sticker=random.choice(STICKERS)
-        )
-
-        await message.reply_photo(
-            photo=config.START_IMG_URL,
-            caption=_["start_2"].format(message.from_user.mention, app.mention),
-            reply_markup=InlineKeyboardMarkup(out),
-        )
-
-        if await is_on_off(config.LOG):
-            sender_id = message.from_user.id
-            sender_name = message.from_user.first_name
-            await app.send_message(
-                config.LOG_GROUP_ID,
-                (
-                    f"{message.from_user.mention} ʜᴀs sᴛᴀʀᴛᴇᴅ ʙᴏᴛ.\n\n"
-                    f"**ᴜsᴇʀ ɪᴅ:** `{sender_id}`\n"
-                    f"**ᴜsᴇʀ ɴᴀᴍᴇ:** {sender_name}"
-                ),
-            )
+    await message.reply_video(
+        video=config.START_VID_URL,
+        caption=_["start_2"].format(message.from_user.mention, app.mention),
+        reply_markup=InlineKeyboardMarkup(out),
+    )
 
 
+# ================= GROUP START ================= #
 @app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
     uptime = int(time.time() - _boot_)
-    await message.reply_photo(
-        photo=config.START_IMG_URL,
+    await message.reply_video(
+        video=config.START_VID_URL,
         caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
         reply_markup=InlineKeyboardMarkup(out),
     )
-    return await add_served_chat(message.chat.id)
+    await add_served_chat(message.chat.id)
 
 
+# ================= WELCOME ================= #
 @app.on_message(filters.new_chat_members, group=-1)
 async def welcome(client, message: Message):
     for member in message.new_chat_members:
@@ -168,10 +124,7 @@ async def welcome(client, message: Message):
             _ = get_string(language)
 
             if await is_banned_user(member.id):
-                try:
-                    await message.chat.ban_member(member.id)
-                except:
-                    pass
+                await message.chat.ban_member(member.id)
 
             if member.id == app.id:
                 if message.chat.type != ChatType.SUPERGROUP:
@@ -190,8 +143,8 @@ async def welcome(client, message: Message):
                     return await app.leave_chat(message.chat.id)
 
                 out = start_panel(_)
-                await message.reply_photo(
-                    photo=config.START_IMG_URL,
+                await message.reply_video(
+                    video=config.START_VID_URL,
                     caption=_["start_3"].format(
                         message.from_user.first_name,
                         app.mention,
@@ -204,6 +157,5 @@ async def welcome(client, message: Message):
                 await add_served_chat(message.chat.id)
                 await message.stop_propagation()
 
-        except Exception as ex:
-            print(ex)
-            
+        except Exception as e:
+            print(e)
