@@ -147,14 +147,12 @@ DURATION_LIMIT = int(time_to_seconds(f"{DURATION_LIMIT_MIN}:00"))
 
 # ================= URL CHECK ================= #
 
-if SUPPORT_CHANNEL:
-    if not re.match("(?:http|https)://", SUPPORT_CHANNEL):
-        raise SystemExit(
-            "[ERROR] - SUPPORT_CHANNEL must start with https://"
-        )
+if SUPPORT_CHANNEL and not re.match("(?:http|https)://", SUPPORT_CHANNEL):
+    raise SystemExit(
+        "[ERROR] - SUPPORT_CHANNEL must start with https://"
+    )
 
-if SUPPORT_CHAT:
-    if not re.match("(?:http|https)://", SUPPORT_CHAT):
-        raise SystemExit(
-            "[ERROR] - SUPPORT_CHAT must start with https://"
-        )
+if SUPPORT_CHAT and not re.match("(?:http|https)://", SUPPORT_CHAT):
+    raise SystemExit(
+        "[ERROR] - SUPPORT_CHAT must start with https://"
+    )
