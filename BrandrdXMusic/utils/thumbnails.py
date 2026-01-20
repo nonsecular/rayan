@@ -1,197 +1,35 @@
 import os
-import re
 import time
-import aiofiles
-import aiohttp
+import requests
+from io import BytesIO
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
-from youtubesearchpython.__future__ import VideosSearch
-from config import YOUTUBE_IMG_URL
 
-# ===================== CONSTANTS =====================
-
+OUTPUT_W, OUTPUT_H = 1280, 720
 CACHE_DIR = "cache"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-OUTPUT_W, OUTPUT_H = 1280, 720
-
-# 🔥 CUSTOM BACKGROUND IMAGE (OPTIONAL)
-BG_IMAGE = "BrandrdXMusic/assets/thumb/bg.jpg"
-
-PANEL_W, PANEL_H = 763, 545
-PANEL_X = (OUTPUT_W - PANEL_W) // 2
-PANEL_Y = 88
-
-TRANSPARENCY = 170
-INNER_OFFSET = 36
-
-THUMB_W, THUMB_H = 542, 273
-THUMB_X = PANEL_X + (PANEL_W - THUMB_W) // 2
-THUMB_Y = PANEL_Y + INNER_OFFSET
-
-TITLE_X = 377
-META_X = 377
-TITLE_Y = THUMB_Y + THUMB_H + 10
-META_Y = TITLE_Y + 45
-
-BAR_X, BAR_Y = 388, META_Y + 45
-BAR_RED_LEN = 280
-BAR_TOTAL_LEN = 480
-
-ICONS_W, ICONS_H = 415, 45
-ICONS_X = PANEL_X + (PANEL_W - ICONS_W) // 2
-ICONS_Y = BAR_Y + 48
-
-MAX_TITLE_WIDTH = 580
-
-FONT_TITLE_PATH = "BrandrdXMusic/assets/thumb/font2.ttf"
-FONT_REGULAR_PATH = "BrandrdXMusic/assets/thumb/font.ttf"
-ICONS_PATH = "BrandrdXMusic/assets/thumb/play_icons.png"
-
-# ===================== HELPERS =====================
-
-def trim_to_width(text: str, font: ImageFont.FreeTypeFont, max_w: int) -> str:
-    ellipsis = "…"
-    if font.getlength(text) <= max_w:
-        return text
-    for i in range(len(text), 0, -1):
-        if font.getlength(text[:i] + ellipsis) <= max_w:
-            return text[:i] + ellipsis
-    return ellipsis
-
-
-def load_font(path: str, size: int):
-    try:
-        return ImageFont.truetype(path, size)
-    except Exception:
-        return ImageFont.load_default()
-
-# ===================== MAIN =====================
+# 🔥 FIXED IMAGE (ALWAYS THIS)
+FIXED_IMAGE_URL = "https://files.catbox.moe/4rk0j2.jpg"
 
 async def get_thumb(videoid: str) -> str:
+    # 🔥 UNIQUE FILE EVERY TIME (NO TELEGRAM CACHE)
+    cache_path = os.path.join(
+        CACHE_DIR, f"{videoid}_{int(time.time())}.png"
+    )
 
-    cache_path = os.path.join(CACHE_DIR, f"{videoid}_final.png")
-    if os.path.exists(cache_path):
-        return cache_path
+    # 🔥 DOWNLOAD FIXED IMAGE
+    resp = requests.get(FIXED_IMAGE_URL, timeout=10)
+    img = Image.open(BytesIO(resp.content)).convert("RGBA")
 
-    # ===================== YOUTUBE META =====================
-
-    try:
-        search = VideosSearch(f"https://www.youtube.com/watch?v={videoid}", limit=1)
-        data = (await search.next())["result"][0]
-        title = re.sub(r"\s+", " ", data.get("title", "Unknown Title")).strip()
-        duration = data.get("duration")
-        views = data.get("viewCount", {}).get("short", "Unknown Views")
-        yt_thumb = data["thumbnails"][0]["url"]
-    except Exception:
-        title = "Unsupported Title"
-        duration = None
-        views = "Unknown Views"
-        yt_thumb = YOUTUBE_IMG_URL
-
-    is_live = not duration or str(duration).lower() in ("", "live", "live now")
-    duration_text = "Live" if is_live else duration
-
-    # ===================== DOWNLOAD YT THUMB (FALLBACK) =====================
-
-    temp_thumb = os.path.join(CACHE_DIR, f"yt_{videoid}.png")
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(yt_thumb) as resp:
-                if resp.status == 200:
-                    async with aiofiles.open(temp_thumb, "wb") as f:
-                        await f.write(await resp.read())
-    except Exception:
-        pass
-
-    # ===================== BACKGROUND SOURCE =====================
-
-    # 🔒 FAIL-SAFE: bg.jpg nahi mile to yt thumbnail use hoga
-    bg_source = BG_IMAGE if os.path.isfile(BG_IMAGE) else temp_thumb
-
-    base_bg = Image.open(bg_source).resize((OUTPUT_W, OUTPUT_H)).convert("RGBA")
-
+    # BACKGROUND
     bg = ImageEnhance.Brightness(
-        base_bg.filter(ImageFilter.GaussianBlur(16))
+        img.resize((OUTPUT_W, OUTPUT_H)).filter(ImageFilter.GaussianBlur(18))
     ).enhance(0.55)
 
-    # ===================== GLASS PANEL =====================
-
-    panel_crop = bg.crop((PANEL_X, PANEL_Y, PANEL_X + PANEL_W, PANEL_Y + PANEL_H))
-    overlay = Image.new("RGBA", (PANEL_W, PANEL_H), (255, 255, 255, TRANSPARENCY))
-    frosted = Image.alpha_composite(panel_crop, overlay)
-
-    mask = Image.new("L", (PANEL_W, PANEL_H), 0)
-    ImageDraw.Draw(mask).rounded_rectangle((0, 0, PANEL_W, PANEL_H), 50, fill=255)
-    bg.paste(frosted, (PANEL_X, PANEL_Y), mask)
-
-    draw = ImageDraw.Draw(bg)
-
-    title_font = load_font(FONT_TITLE_PATH, 32)
-    regular_font = load_font(FONT_REGULAR_PATH, 18)
-
-    # ===================== CENTER IMAGE =====================
-
-    inner_source = bg_source
-    inner = Image.open(inner_source).resize((THUMB_W, THUMB_H)).convert("RGBA")
-
-    tmask = Image.new("L", (THUMB_W, THUMB_H), 0)
-    ImageDraw.Draw(tmask).rounded_rectangle((0, 0, THUMB_W, THUMB_H), 20, fill=255)
-    bg.paste(inner, (THUMB_X, THUMB_Y), tmask)
-
-    # ===================== TEXT =====================
-
-    draw.text(
-        (TITLE_X, TITLE_Y),
-        trim_to_width(title, title_font, MAX_TITLE_WIDTH),
-        fill="black",
-        font=title_font,
-    )
-
-    draw.text(
-        (META_X, META_Y),
-        f"YouTube • {views}",
-        fill="black",
-        font=regular_font,
-    )
-
-    # ===================== PROGRESS BAR =====================
-
-    draw.line([(BAR_X, BAR_Y), (BAR_X + BAR_RED_LEN, BAR_Y)], fill="red", width=6)
-    draw.line(
-        [(BAR_X + BAR_RED_LEN, BAR_Y), (BAR_X + BAR_TOTAL_LEN, BAR_Y)],
-        fill="gray",
-        width=5,
-    )
-    draw.ellipse(
-        [
-            (BAR_X + BAR_RED_LEN - 7, BAR_Y - 7),
-            (BAR_X + BAR_RED_LEN + 7, BAR_Y + 7),
-        ],
-        fill="red",
-    )
-
-    draw.text((BAR_X, BAR_Y + 15), "00:00", fill="black", font=regular_font)
-    draw.text(
-        (BAR_X + BAR_TOTAL_LEN - 70, BAR_Y + 15),
-        duration_text,
-        fill="red" if is_live else "black",
-        font=regular_font,
-    )
-
-    # ===================== ICONS =====================
-
-    if os.path.isfile(ICONS_PATH):
-        icons = Image.open(ICONS_PATH).resize((ICONS_W, ICONS_H)).convert("RGBA")
-        bg.paste(icons, (ICONS_X, ICONS_Y), icons)
-
-    # ===================== SAVE =====================
+    # CENTER IMAGE
+    center = img.resize((540, 270))
+    mask = Image.new("L", center.size, 255)
+    bg.paste(center, (370, 170), mask)
 
     bg.save(cache_path)
-
-    try:
-        if os.path.isfile(temp_thumb):
-            os.remove(temp_thumb)
-    except:
-        pass
-
     return cache_path
