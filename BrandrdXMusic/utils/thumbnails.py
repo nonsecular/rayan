@@ -1,32 +1,48 @@
 import os
 import time
-import requests
-from io import BytesIO
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+import aiohttp
+import aiofiles
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
-OUTPUT_W, OUTPUT_H = 1280, 720
 CACHE_DIR = "cache"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-# 🔥 FIXED IMAGE (ALWAYS THIS)
+OUTPUT_W, OUTPUT_H = 1280, 720
+
+# 🔥 FIXED IMAGE URL
 FIXED_IMAGE_URL = "https://files.catbox.moe/4rk0j2.jpg"
 
+# 🔥 LOCAL FALLBACK (MUST EXIST)
+LOCAL_BG = "BrandrdXMusic/assets/thumb/bg.jpg"
+
+
 async def get_thumb(videoid: str) -> str:
-    # 🔥 UNIQUE FILE EVERY TIME (NO TELEGRAM CACHE)
+    # 🔥 UNIQUE FILE (TELEGRAM CACHE DEAD)
     cache_path = os.path.join(
         CACHE_DIR, f"{videoid}_{int(time.time())}.png"
     )
 
-    # 🔥 DOWNLOAD FIXED IMAGE
-    resp = requests.get(FIXED_IMAGE_URL, timeout=10)
-    img = Image.open(BytesIO(resp.content)).convert("RGBA")
+    img = None
 
-    # BACKGROUND
+    # ================= TRY ONLINE IMAGE =================
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(FIXED_IMAGE_URL, timeout=10) as resp:
+                if resp.status == 200:
+                    data = await resp.read()
+                    img = Image.open(io.BytesIO(data)).convert("RGBA")
+    except Exception:
+        img = None
+
+    # ================= FALLBACK (NO CRASH) =================
+    if img is None:
+        img = Image.open(LOCAL_BG).convert("RGBA")
+
+    # ================= BUILD THUMB =================
     bg = ImageEnhance.Brightness(
         img.resize((OUTPUT_W, OUTPUT_H)).filter(ImageFilter.GaussianBlur(18))
     ).enhance(0.55)
 
-    # CENTER IMAGE
     center = img.resize((540, 270))
     mask = Image.new("L", center.size, 255)
     bg.paste(center, (370, 170), mask)
