@@ -1,11 +1,8 @@
 import os
 from random import randint
 from typing import Union
-import random
-import string
 import asyncio
 
-from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, Message
 from pytgcalls.exceptions import NoActiveGroupCall
 
@@ -18,12 +15,10 @@ from BrandrdXMusic.utils.exceptions import AssistantErr
 from BrandrdXMusic.utils.inline import (
     aq_markup,
     close_markup,
-    stream_markup,
-    stream_markup2,
+    stream_markup,   # ✅ only this
 )
-from BrandrdXMusic.utils.logger import play_logs
 from BrandrdXMusic.utils.stream.queue import put_queue, put_queue_index
-from BrandrdXMusic.utils.thumbnails import get_thumb   # 🔥 ONLY SOURCE
+from BrandrdXMusic.utils.thumbnails import get_thumb   # ✅ PIL thumbnail
 from BrandrdXMusic.utils.pastebin import HottyBin
 
 
@@ -106,7 +101,7 @@ async def stream(
                     "video" if video else "audio",
                 )
 
-                img = await get_thumb(vidid)   # ✅ CUSTOM THUMB
+                img = await get_thumb(vidid)
                 button = stream_markup(_, vidid, chat_id)
 
                 run = await app.send_photo(
@@ -215,7 +210,7 @@ async def stream(
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "stream"
 
-    # ================= SOUND CLOUD =================
+    # ================= SOUNDCLOUD =================
     elif streamtype == "soundcloud":
         file_path = result["filepath"]
         title = result["title"]
@@ -257,7 +252,9 @@ async def stream(
                 caption=_["stream_1"].format(
                     config.SUPPORT_CHAT, title[:23], duration_min, user_name
                 ),
-                reply_markup=InlineKeyboardMarkup(stream_markup2(_, chat_id)),
+                reply_markup=InlineKeyboardMarkup(
+                    stream_markup(_, chat_id)
+                ),
             )
 
             db[chat_id][0]["mystic"] = run
