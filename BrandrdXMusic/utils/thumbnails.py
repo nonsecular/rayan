@@ -14,7 +14,7 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 
 OUTPUT_W, OUTPUT_H = 1280, 720
 
-# 🔥 BACKGROUND IMAGE (PUT YOUR IMAGE HERE)
+# 🔥 CUSTOM BACKGROUND IMAGE (OPTIONAL)
 BG_IMAGE = "BrandrdXMusic/assets/thumb/bg.jpg"
 
 PANEL_W, PANEL_H = 763, 545
@@ -69,11 +69,11 @@ def load_font(path: str, size: int):
 
 async def get_thumb(videoid: str) -> str:
 
-    cache_path = os.path.join(CACHE_DIR, f"{videoid}_bg.png")
+    cache_path = os.path.join(CACHE_DIR, f"{videoid}_final.png")
     if os.path.exists(cache_path):
         return cache_path
 
-    # ===================== YOUTUBE DATA (ONLY TEXT) =====================
+    # ===================== YOUTUBE META =====================
 
     try:
         search = VideosSearch(f"https://www.youtube.com/watch?v={videoid}", limit=1)
@@ -81,23 +81,41 @@ async def get_thumb(videoid: str) -> str:
         title = re.sub(r"\s+", " ", data.get("title", "Unknown Title")).strip()
         duration = data.get("duration")
         views = data.get("viewCount", {}).get("short", "Unknown Views")
+        yt_thumb = data["thumbnails"][0]["url"]
     except Exception:
         title = "Unsupported Title"
         duration = None
         views = "Unknown Views"
+        yt_thumb = YOUTUBE_IMG_URL
 
     is_live = not duration or str(duration).lower() in ("", "live", "live now")
     duration_text = "Live" if is_live else duration
 
-    # ===================== IMAGE PROCESS =====================
+    # ===================== DOWNLOAD YT THUMB (FALLBACK) =====================
 
-    # 🔥 BACKGROUND (BLUR + DARK)
-    base_bg = Image.open(BG_IMAGE).resize((OUTPUT_W, OUTPUT_H)).convert("RGBA")
+    temp_thumb = os.path.join(CACHE_DIR, f"yt_{videoid}.png")
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(yt_thumb) as resp:
+                if resp.status == 200:
+                    async with aiofiles.open(temp_thumb, "wb") as f:
+                        await f.write(await resp.read())
+    except Exception:
+        pass
+
+    # ===================== BACKGROUND SOURCE =====================
+
+    # 🔒 FAIL-SAFE: bg.jpg nahi mile to yt thumbnail use hoga
+    bg_source = BG_IMAGE if os.path.isfile(BG_IMAGE) else temp_thumb
+
+    base_bg = Image.open(bg_source).resize((OUTPUT_W, OUTPUT_H)).convert("RGBA")
+
     bg = ImageEnhance.Brightness(
         base_bg.filter(ImageFilter.GaussianBlur(16))
     ).enhance(0.55)
 
-    # 🔥 FROSTED GLASS PANEL
+    # ===================== GLASS PANEL =====================
+
     panel_crop = bg.crop((PANEL_X, PANEL_Y, PANEL_X + PANEL_W, PANEL_Y + PANEL_H))
     overlay = Image.new("RGBA", (PANEL_W, PANEL_H), (255, 255, 255, TRANSPARENCY))
     frosted = Image.alpha_composite(panel_crop, overlay)
@@ -111,8 +129,11 @@ async def get_thumb(videoid: str) -> str:
     title_font = load_font(FONT_TITLE_PATH, 32)
     regular_font = load_font(FONT_REGULAR_PATH, 18)
 
-    # 🔥 CENTER IMAGE (SHARP – SAME BG IMAGE)
-    inner = Image.open(BG_IMAGE).resize((THUMB_W, THUMB_H)).convert("RGBA")
+    # ===================== CENTER IMAGE =====================
+
+    inner_source = bg_source
+    inner = Image.open(inner_source).resize((THUMB_W, THUMB_H)).convert("RGBA")
+
     tmask = Image.new("L", (THUMB_W, THUMB_H), 0)
     ImageDraw.Draw(tmask).rounded_rectangle((0, 0, THUMB_W, THUMB_H), 20, fill=255)
     bg.paste(inner, (THUMB_X, THUMB_Y), tmask)
@@ -166,4 +187,11 @@ async def get_thumb(videoid: str) -> str:
     # ===================== SAVE =====================
 
     bg.save(cache_path)
+
+    try:
+        if os.path.isfile(temp_thumb):
+            os.remove(temp_thumb)
+    except:
+        pass
+
     return cache_path
