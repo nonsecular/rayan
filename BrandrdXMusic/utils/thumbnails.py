@@ -14,6 +14,9 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 
 OUTPUT_W, OUTPUT_H = 1280, 720
 
+# 🔥 BACKGROUND IMAGE (PUT YOUR IMAGE HERE)
+BG_IMAGE = "BrandrdXMusic/assets/thumb/bg.jpg"
+
 PANEL_W, PANEL_H = 763, 545
 PANEL_X = (OUTPUT_W - PANEL_W) // 2
 PANEL_Y = 88
@@ -65,61 +68,36 @@ def load_font(path: str, size: int):
 # ===================== MAIN =====================
 
 async def get_thumb(videoid: str) -> str:
-    """
-    FINAL VERSION:
-    - No stale cache
-    - New thumbnail every deploy
-    - Safe font loading
-    - Heroku friendly
-    """
 
-    # 🔥 VERSIONED CACHE (FORCE REFRESH ON CODE CHANGE)
-    cache_path = os.path.join(CACHE_DIR, f"{videoid}_v5.png")
-
+    cache_path = os.path.join(CACHE_DIR, f"{videoid}_bg.png")
     if os.path.exists(cache_path):
         return cache_path
 
-    # ===================== YOUTUBE DATA =====================
+    # ===================== YOUTUBE DATA (ONLY TEXT) =====================
 
     try:
         search = VideosSearch(f"https://www.youtube.com/watch?v={videoid}", limit=1)
         data = (await search.next())["result"][0]
-
         title = re.sub(r"\s+", " ", data.get("title", "Unknown Title")).strip()
-        thumbnail = data["thumbnails"][0]["url"]
         duration = data.get("duration")
         views = data.get("viewCount", {}).get("short", "Unknown Views")
     except Exception:
         title = "Unsupported Title"
-        thumbnail = YOUTUBE_IMG_URL
         duration = None
         views = "Unknown Views"
 
     is_live = not duration or str(duration).lower() in ("", "live", "live now")
     duration_text = "Live" if is_live else duration
 
-    # ===================== DOWNLOAD THUMB =====================
-
-    temp_thumb = os.path.join(CACHE_DIR, f"yt_{videoid}_{int(time.time())}.png")
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(thumbnail) as resp:
-                if resp.status == 200:
-                    async with aiofiles.open(temp_thumb, "wb") as f:
-                        await f.write(await resp.read())
-    except Exception:
-        return YOUTUBE_IMG_URL
-
     # ===================== IMAGE PROCESS =====================
 
-    base = Image.open(temp_thumb).resize((OUTPUT_W, OUTPUT_H)).convert("RGBA")
-
+    # 🔥 BACKGROUND (BLUR + DARK)
+    base_bg = Image.open(BG_IMAGE).resize((OUTPUT_W, OUTPUT_H)).convert("RGBA")
     bg = ImageEnhance.Brightness(
-        base.filter(ImageFilter.BoxBlur(12))
-    ).enhance(0.6)
+        base_bg.filter(ImageFilter.GaussianBlur(16))
+    ).enhance(0.55)
 
-    # Frosted panel
+    # 🔥 FROSTED GLASS PANEL
     panel_crop = bg.crop((PANEL_X, PANEL_Y, PANEL_X + PANEL_W, PANEL_Y + PANEL_H))
     overlay = Image.new("RGBA", (PANEL_W, PANEL_H), (255, 255, 255, TRANSPARENCY))
     frosted = Image.alpha_composite(panel_crop, overlay)
@@ -133,13 +111,14 @@ async def get_thumb(videoid: str) -> str:
     title_font = load_font(FONT_TITLE_PATH, 32)
     regular_font = load_font(FONT_REGULAR_PATH, 18)
 
-    # Inner thumbnail
-    thumb = base.resize((THUMB_W, THUMB_H))
+    # 🔥 CENTER IMAGE (SHARP – SAME BG IMAGE)
+    inner = Image.open(BG_IMAGE).resize((THUMB_W, THUMB_H)).convert("RGBA")
     tmask = Image.new("L", (THUMB_W, THUMB_H), 0)
     ImageDraw.Draw(tmask).rounded_rectangle((0, 0, THUMB_W, THUMB_H), 20, fill=255)
-    bg.paste(thumb, (THUMB_X, THUMB_Y), tmask)
+    bg.paste(inner, (THUMB_X, THUMB_Y), tmask)
 
-    # Text
+    # ===================== TEXT =====================
+
     draw.text(
         (TITLE_X, TITLE_Y),
         trim_to_width(title, title_font, MAX_TITLE_WIDTH),
@@ -154,7 +133,8 @@ async def get_thumb(videoid: str) -> str:
         font=regular_font,
     )
 
-    # Progress bar
+    # ===================== PROGRESS BAR =====================
+
     draw.line([(BAR_X, BAR_Y), (BAR_X + BAR_RED_LEN, BAR_Y)], fill="red", width=6)
     draw.line(
         [(BAR_X + BAR_RED_LEN, BAR_Y), (BAR_X + BAR_TOTAL_LEN, BAR_Y)],
@@ -177,22 +157,13 @@ async def get_thumb(videoid: str) -> str:
         font=regular_font,
     )
 
-    # Icons
+    # ===================== ICONS =====================
+
     if os.path.isfile(ICONS_PATH):
         icons = Image.open(ICONS_PATH).resize((ICONS_W, ICONS_H)).convert("RGBA")
-        r, g, b, a = icons.split()
-        black_icons = Image.merge(
-            "RGBA",
-            (r.point(lambda _: 0), g.point(lambda _: 0), b.point(lambda _: 0), a),
-        )
-        bg.paste(black_icons, (ICONS_X, ICONS_Y), black_icons)
+        bg.paste(icons, (ICONS_X, ICONS_Y), icons)
 
     # ===================== SAVE =====================
-
-    try:
-        os.remove(temp_thumb)
-    except Exception:
-        pass
 
     bg.save(cache_path)
     return cache_path
