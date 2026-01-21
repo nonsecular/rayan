@@ -42,6 +42,7 @@ py-yt-search>=0.5.4
 youtube-search-python>=1.6.6
 youtube-search>=2.1.2
 httpx>=0.27.2
+spotipy>=2.24.0
 
 # Pyrogram Latest
 https://github.com/pyrogram/pyrogram/archive/master.zip
