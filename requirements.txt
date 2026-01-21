@@ -29,7 +29,6 @@ yt-dlp>=2025.01.18
 lexica-api>=1.5.9
 openai>=1.60.0
 lyricsgenius>=3.2.0
-spotipy>=2.25.0
 SafoneAPI>=1.1.4
 MukeshAPI>=1.2.8
 
