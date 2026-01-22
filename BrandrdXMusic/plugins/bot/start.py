@@ -25,7 +25,12 @@ from BrandrdXMusic.utils.database import (
 )
 from BrandrdXMusic.utils.decorators.language import LanguageStart
 from BrandrdXMusic.utils.formatters import get_readable_time
-from BrandrdXMusic.utils.inline import help_pannel, private_panel, start_panel
+from BrandrdXMusic.utils.inline import (
+    help_pannel,
+    private_panel,
+    start_panel,
+    is_on_off,
+)
 from strings import get_string
 
 
@@ -36,6 +41,7 @@ async def start_pm(client, message: Message, _):
     try:
         await add_served_user(message.from_user.id)
 
+        # ===== START PARAMS =====
         if len(message.text.split()) > 1:
             name = message.text.split(None, 1)[1]
 
@@ -49,9 +55,7 @@ async def start_pm(client, message: Message, _):
 
             # SUDO
             if name.startswith("sud"):
-                return await sudoers_list(
-                    client=client, message=message, _=_
-                )
+                return await sudoers_list(client=client, message=message, _=_)
 
             # INFO
             if name.startswith("inf"):
@@ -81,7 +85,9 @@ async def start_pm(client, message: Message, _):
                     [
                         [
                             InlineKeyboardButton(_["S_B_8"], url=r["link"]),
-                            InlineKeyboardButton(_["S_B_9"], url=config.SUPPORT_CHAT),
+                            InlineKeyboardButton(
+                                _["S_B_9"], url=config.SUPPORT_CHAT
+                            ),
                         ]
                     ]
                 )
@@ -94,7 +100,7 @@ async def start_pm(client, message: Message, _):
                     reply_markup=buttons,
                 )
 
-        # NORMAL START
+        # ===== NORMAL START =====
         await message.reply_video(
             video=config.START_VID_URL,
             caption=_["start_2"].format(
@@ -102,6 +108,16 @@ async def start_pm(client, message: Message, _):
             ),
             reply_markup=InlineKeyboardMarkup(private_panel(_)),
         )
+
+        # ===== START LOGGER =====
+        if await is_on_off(config.LOG):
+            sender = message.from_user
+            await app.send_message(
+                config.LOG_GROUP_ID,
+                f"{sender.mention} ʜᴀs sᴛᴀʀᴛᴇᴅ ʙᴏᴛ.\n\n"
+                f"**ᴜsᴇʀ ɪᴅ :** `{sender.id}`\n"
+                f"**ᴜsᴇʀ ɴᴀᴍᴇ :** {sender.first_name}",
+            )
 
     except Exception as e:
         print(f"[START_PM ERROR] {e}")
@@ -113,16 +129,26 @@ async def start_pm(client, message: Message, _):
 async def start_gp(client, message: Message, _):
     try:
         uptime = int(time.time() - _boot_)
+        out = start_panel(_)
 
         await message.reply_video(
             video=config.START_VID_URL,
             caption=_["start_1"].format(
                 app.mention, get_readable_time(uptime)
             ),
-            reply_markup=InlineKeyboardMarkup(start_panel(_)),
+            reply_markup=InlineKeyboardMarkup(out),
         )
 
         await add_served_chat(message.chat.id)
+
+        # ===== GROUP START LOGGER =====
+        if await is_on_off(config.LOG):
+            await app.send_message(
+                config.LOG_GROUP_ID,
+                f"{message.from_user.mention} started bot in group\n\n"
+                f"**Group:** {message.chat.title}\n"
+                f"**Group ID:** `{message.chat.id}`",
+            )
 
     except Exception as e:
         print(f"[START_GP ERROR] {e}")
@@ -137,7 +163,10 @@ async def welcome(client, message: Message):
 
         for member in message.new_chat_members:
             if await is_banned_user(member.id):
-                await message.chat.ban_member(member.id)
+                try:
+                    await message.chat.ban_member(member.id)
+                except:
+                    pass
                 continue
 
             if member.id == app.id:
@@ -156,6 +185,7 @@ async def welcome(client, message: Message):
                     )
                     return await app.leave_chat(message.chat.id)
 
+                out = start_panel(_)
                 await message.reply_video(
                     video=config.START_VID_URL,
                     caption=_["start_3"].format(
@@ -164,7 +194,7 @@ async def welcome(client, message: Message):
                         message.chat.title,
                         app.mention,
                     ),
-                    reply_markup=InlineKeyboardMarkup(start_panel(_)),
+                    reply_markup=InlineKeyboardMarkup(out),
                 )
 
                 await add_served_chat(message.chat.id)
