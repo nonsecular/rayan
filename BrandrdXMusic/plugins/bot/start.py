@@ -9,8 +9,7 @@ from pyrogram.types import (
     Message,
 )
 
-from youtubesearchpython.future import VideosSearch
-
+from youtubesearchpython import VideosSearch
 import config
 from config import BANNED_USERS
 
