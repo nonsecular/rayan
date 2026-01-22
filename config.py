@@ -56,6 +56,10 @@ AUTO_LEAVING_ASSISTANT = bool(getenv("AUTO_LEAVING_ASSISTANT", False))
 AUTO_GCAST = getenv("AUTO_GCAST")
 AUTO_GCAST_MSG = getenv("AUTO_GCAST_MSG", "")
 
+ASSISTANT_USERNAME = "UnknownAura"        # WITHOUT @
+ASSISTANT_NAME = "Unknown Aura"
+
+
 # ================= SPOTIFY ================= #
 
 SPOTIFY_CLIENT_ID = getenv(
@@ -130,30 +134,3 @@ PING_IMG_URL = getenv(
 PLAYLIST_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
 STATS_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
 TELEGRAM_AUDIO_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-TELEGRAM_VIDEO_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-STREAM_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-SOUNCLOUD_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-YOUTUBE_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-SPOTIFY_ARTIST_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-SPOTIFY_ALBUM_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-SPOTIFY_PLAYLIST_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-
-# ================= UTILS ================= #
-
-def time_to_seconds(time):
-    stringt = str(time)
-    return sum(int(x) * 60**i for i, x in enumerate(reversed(stringt.split(":"))))
-
-DURATION_LIMIT = int(time_to_seconds(f"{DURATION_LIMIT_MIN}:00"))
-
-# ================= URL CHECK ================= #
-
-if SUPPORT_CHANNEL and not re.match("(?:http|https)://", SUPPORT_CHANNEL):
-    raise SystemExit(
-        "[ERROR] - SUPPORT_CHANNEL must start with https://"
-    )
-
-if SUPPORT_CHAT and not re.match("(?:http|https)://", SUPPORT_CHAT):
-    raise SystemExit(
-        "[ERROR] - SUPPORT_CHAT must start with https://"
-    )
