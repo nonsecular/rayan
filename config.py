@@ -1,7 +1,5 @@
 import re
-import os
 from os import getenv
-
 from dotenv import load_dotenv
 from pyrogram import filters
 
@@ -10,18 +8,18 @@ load_dotenv()
 # ================= BASIC ================= #
 
 API_ID = int(getenv("API_ID", 0))
-API_HASH = getenv("API_HASH")
-BOT_TOKEN = getenv("BOT_TOKEN")
+API_HASH = getenv("API_HASH", "")
+BOT_TOKEN = getenv("BOT_TOKEN", "")
 
-MONGO_DB_URI = getenv("MONGO_DB_URI")
-MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME")
-PRIVATE_BOT_MODE = getenv("PRIVATE_BOT_MODE")
+MONGO_DB_URI = getenv("MONGO_DB_URI", "")
+MUSIC_BOT_NAME = getenv("MUSIC_BOT_NAME", "BrandrdXMusic")
+PRIVATE_BOT_MODE = bool(getenv("PRIVATE_BOT_MODE", False))
 
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 999999))
 
-#LOGGER_ID = int(getenv("LOGGER_ID", "-1002276415311"))
-LOGGER_ID = -1002276415311
-OWNER_ID = int(getenv("OWNER_ID", 0))
+# 🔥 MUST BE INT & VALID GROUP/CHANNEL ID
+LOGGER_ID = int(getenv("LOGGER_ID", "-1002276415311"))
+OWNER_ID = int(getenv("OWNER_ID", "0"))
 
 LOG = int(getenv("LOG", 1))
 
@@ -56,9 +54,8 @@ AUTO_LEAVING_ASSISTANT = bool(getenv("AUTO_LEAVING_ASSISTANT", False))
 AUTO_GCAST = getenv("AUTO_GCAST")
 AUTO_GCAST_MSG = getenv("AUTO_GCAST_MSG", "")
 
-ASSISTANT_USERNAME = "UnknownAura"        # WITHOUT @
-ASSISTANT_NAME = "Unknown Aura"
-
+ASSISTANT_USERNAME = getenv("ASSISTANT_USERNAME", "UnknownAura")  # without @
+ASSISTANT_NAME = getenv("ASSISTANT_NAME", "Unknown Aura")
 
 # ================= SPOTIFY ================= #
 
@@ -76,7 +73,6 @@ SPOTIFY_CLIENT_SECRET = getenv(
 SERVER_PLAYLIST_LIMIT = int(getenv("SERVER_PLAYLIST_LIMIT", 999))
 PLAYLIST_FETCH_LIMIT = int(getenv("PLAYLIST_FETCH_LIMIT", 999))
 
-SONG_DOWNLOAD_DURATION = int(getenv("SONG_DOWNLOAD_DURATION_LIMIT", 999))
 SONG_DOWNLOAD_DURATION_LIMIT = int(getenv("SONG_DOWNLOAD_DURATION_LIMIT", 999999))
 
 TG_AUDIO_FILESIZE_LIMIT = int(getenv("TG_AUDIO_FILESIZE_LIMIT", 104857600))
@@ -103,14 +99,21 @@ confirmer = {}
 
 START_IMG_URL = getenv(
     "START_IMG_URL",
-    "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
+    "https://i.imgur.com/8pQeK0F.jpg"
 )
 
 START_VID_URL = getenv(
     "START_VID_URL",
     "https://files.catbox.moe/m8wvfi.mp4"
 )
+
+# ================= REQUIRED CALLBACK IMAGES ================= #
+
+STREAM_IMG_URL = "https://i.imgur.com/8pQeK0F.jpg"
 SOUNCLOUD_IMG_URL = "https://i.imgur.com/8pQeK0F.jpg"
+YOUTUBE_IMG_URL = "https://i.imgur.com/8pQeK0F.jpg"
+SPOTIFY_IMG_URL = "https://i.imgur.com/8pQeK0F.jpg"
+
 # ================= STICKERS ================= #
 
 STICKERS = [
@@ -126,11 +129,7 @@ AYU = [
 
 # ================= OTHER IMAGES ================= #
 
-PING_IMG_URL = getenv(
-    "PING_IMG_URL",
-    "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-)
-
-PLAYLIST_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-STATS_IMG_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
-TELEGRAM_AUDIO_URL = "https://telegra.ph/file/4dc854f961cd3ce46899b.jpg"
+PING_IMG_URL = "https://i.imgur.com/8pQeK0F.jpg"
+PLAYLIST_IMG_URL = "https://i.imgur.com/8pQeK0F.jpg"
+STATS_IMG_URL = "https://i.imgur.com/8pQeK0F.jpg"
+TELEGRAM_AUDIO_URL = "https://i.imgur.com/8pQeK0F.jpg"
