@@ -19,7 +19,7 @@ PRIVATE_BOT_MODE = getenv("PRIVATE_BOT_MODE")
 
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 999999))
 
-#LOGGER_ID = int(getenv("LOGGER_ID", "-1003530337097"))
+#LOGGER_ID = int(getenv("LOGGER_ID", "-1002276415311"))
 LOGGER_ID = -1002276415311
 OWNER_ID = int(getenv("OWNER_ID", 0))
 
@@ -110,7 +110,7 @@ START_VID_URL = getenv(
     "START_VID_URL",
     "https://files.catbox.moe/m8wvfi.mp4"
 )
-
+SOUNCLOUD_IMG_URL = "https://i.imgur.com/8pQeK0F.jpg"
 # ================= STICKERS ================= #
 
 STICKERS = [
