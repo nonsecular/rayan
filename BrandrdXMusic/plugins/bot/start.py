@@ -81,12 +81,8 @@ async def start_pm(client, message: Message, _):
                 buttons = InlineKeyboardMarkup(
                     [
                         [
-                            InlineKeyboardButton(
-                                _["S_B_8"], url=r["link"]
-                            ),
-                            InlineKeyboardButton(
-                                _["S_B_9"], url=config.SUPPORT_CHAT
-                            ),
+                            InlineKeyboardButton(_["S_B_8"], url=r["link"]),
+                            InlineKeyboardButton(_["S_B_9"], url=config.SUPPORT_CHAT),
                         ]
                     ]
                 )
@@ -119,13 +115,14 @@ async def start_gp(client, message: Message, _):
     try:
         uptime = int(time.time() - _boot_)
 
-await message.reply_video(
+        await message.reply_video(
             video=config.START_VID_URL,
             caption=_["start_1"].format(
                 app.mention, get_readable_time(uptime)
             ),
             reply_markup=InlineKeyboardMarkup(start_panel(_)),
         )
+
         await add_served_chat(message.chat.id)
 
     except Exception as e:
